@@ -2,8 +2,8 @@ import boto3
 import os
 import subprocess
 
-
-def text_to_speech(text, output_file="speech.mp3", voice_id="Vicki", engine="generative"):
+# Vicki, Daniel, Lennart, Tina
+def text_to_speech(text, output_file="speech.mp3", voice_id="Lennart", engine="generative"):
     polly_client = boto3.client('polly')
 
     response = polly_client.synthesize_speech(
