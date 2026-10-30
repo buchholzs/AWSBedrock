@@ -1,6 +1,8 @@
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 
+from text_to_speech import text_to_speech
+
 # 1. Bedrock-Runtime Client initialisieren
 # (Achte darauf, eine Region zu wählen, in der Nova Pro aktiv ist, z. B. 'us-east-1')
 # us-east-1, eu-west-1, eu-central-1
@@ -9,7 +11,23 @@ bedrock_client = boto3.client('bedrock-runtime', region_name='eu-west-1')
 # Exakte Model-ID für Amazon Nova Pro
 # amazon.nova-pro-v1:0 für us-east-1
 # eu.amazon.nova-pro-v1:0 für eu-west-1 und eu-central-1
-MODEL_ID = 'eu.amazon.nova-pro-v1:0' 
+MODEL_ID = 'eu.amazon.nova-pro-v1:0'
+
+# AWS Translate-Client für die Übersetzung der Antwort ins Französische
+translate_client = boto3.client('translate', region_name='eu-west-1')
+
+
+def translate_to_french(text):
+  if not text or not text.strip():
+    return text
+
+  response = translate_client.translate_text(
+      Text=text,
+      SourceLanguageCode='auto',
+      TargetLanguageCode='fr',
+  )
+
+  return response.get('TranslatedText', text)
 
 
 def start_chatbot():
@@ -46,8 +64,14 @@ def start_chatbot():
       # 3. Antwort des Modells auslesen
       response_message = response['output']['message']
       bot_reply = response_message['content'][0]['text']
-
       print(f'\nNova Pro: {bot_reply}\n')
+
+      french_reply = translate_to_french(bot_reply)
+      print(f'\nNova Pro (französisch): {french_reply}\n')
+
+      # Übersetzte Antwort mit Amazon Polly ausgeben
+      text_to_speech(bot_reply, voice_id='Lennart')
+      text_to_speech(french_reply, voice_id='Remi', engine='neural')
 
       # Die Antwort des Assistenten dem Verlauf hinzufügen, 
       # damit das Modell sich im nächsten Schritt an den Kontext erinnert
