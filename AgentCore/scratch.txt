@@ -1,0 +1,1 @@
+Update Target operation failed for target-todoist: Dynamic MCP targets (listingMode=DYNAMIC) are not supported on gateways with semantic search enabled.
