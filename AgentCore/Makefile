@@ -1,4 +1,4 @@
-all: build deploy test
+all: build deploy invoke
 
 build:
 	agentcore build
@@ -8,7 +8,7 @@ deploy:
 
 invoke:
 	agentcore invoke --runtime agent \
-  --payload '{"prompt":"Hello, what can you do?"}'
+  --payload '{"prompt":"Liste alle meine Aufgaben auf."}' \
 
 test:
 	agentcore dev --mode browser

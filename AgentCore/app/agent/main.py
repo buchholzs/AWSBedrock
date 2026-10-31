@@ -1,11 +1,12 @@
+from functools import lru_cache
 import logging
 import os
-from functools import lru_cache
 
 from strands import Agent
 from strands.agent.conversation_manager.null_conversation_manager import NullConversationManager
 from strands.tools.mcp import MCPClient
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
+
 from model.load import load_model
 from parse import parse_payload
 from memory.session import get_memory_session_manager
@@ -14,7 +15,36 @@ from mcp_proxy_for_aws.client import aws_iam_streamablehttp_client
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_SYSTEM_PROMPT = "You are a helpful assistant. Use tools when appropriate."
+DEFAULT_SYSTEM_PROMPT = (
+    "You are a helpful assistant. Use tools when appropriate. "
+    "Do not output internal reasoning, chain-of-thought, or <thinking> blocks. "
+    "If a tool call is needed, call the tool directly and continue with the result."
+)
+
+_ALLOWED_TODOIST_TOOLS = {
+    "target-todoist___find-tasks",
+    "target-todoist___find-projects",
+    "target-todoist___find-comments",
+    "target-todoist___add-tasks",
+    "target-todoist___complete-tasks",
+    "target-todoist___fetch-object",
+}
+
+
+def _select_compatible_gateway_tools(tools):
+    """Keep only a very small, stable subset of Todoist tools for Bedrock tool use."""
+    filtered = []
+    for tool in tools:
+        tool_name = getattr(tool, "tool_name", "") or getattr(tool, "name", "") or ""
+        if tool_name in _ALLOWED_TODOIST_TOOLS:
+            filtered.append(tool)
+
+    if not filtered:
+        logger.warning("No allowed Todoist tools matched. Falling back to all gateway tools.")
+        return list(tools)
+
+    logger.info("Loaded %s compatible Todoist gateway tools", len(filtered))
+    return filtered
 
 
 @lru_cache(maxsize=1)
@@ -46,19 +76,18 @@ def _get_gateway_endpoint() -> str:
         )
     return endpoint
 
-
 @lru_cache(maxsize=128)
 def _get_agent(session_id: str, actor_id: str) -> Agent:
-    """Given a session_id and actor_id, return or construct the corresponding Strands agent.
-    Note: caching helps avoid repeated identity fetches on non-bedrock model loads
-    and supports in-memory session management for local dev."""
+    """Create the per-session Strands agent using the current model configuration."""
     gateway_client = _get_gateway_mcp_client()
+    gateway_tools = list(gateway_client.list_tools_sync())
+    compatible_tools = _select_compatible_gateway_tools(gateway_tools)
     return Agent(
         model=load_model(),
         session_manager=get_memory_session_manager(session_id, actor_id),
         conversation_manager=_make_conversation_manager(),
         system_prompt=DEFAULT_SYSTEM_PROMPT,
-        tools=list(gateway_client.list_tools_sync()),
+        tools=compatible_tools,
     )
 
 def create_app():
