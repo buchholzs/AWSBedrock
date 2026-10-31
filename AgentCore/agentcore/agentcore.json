@@ -10,7 +10,15 @@
       "entrypoint": "main.py",
       "codeLocation": "app/agent",
       "runtimeVersion": "PYTHON_3_14",
-      "protocol": "HTTP"
+      "protocol": "HTTP",
+      "envVars": [
+        {
+          "name": "AGENTCORE_GATEWAY_ENDPOINT", "value": "https://gateway-tools-i04fkol9oe.gateway.bedrock-agentcore.eu-central-1.amazonaws.com/mcp"
+        },
+        {          
+          "name": "AGENTCORE_GATEWAY_REGION", "value": "eu-central-1"
+        }
+      ]
     }
   ],
   "memories": [

@@ -1,39 +1,62 @@
+import os
 from functools import lru_cache
 
-from strands import Agent, tool
+from strands import Agent
 from strands.agent.conversation_manager.null_conversation_manager import NullConversationManager
+from strands.tools.mcp import MCPClient
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 from model.load import load_model
 from parse import parse_payload
 from memory.session import get_memory_session_manager
 
+from mcp_proxy_for_aws.client import aws_iam_streamablehttp_client
+from bedrock_agentcore.gateway.integrations.strands.plugins import AgentCoreToolSearchPlugin
+
 DEFAULT_SYSTEM_PROMPT = "You are a helpful assistant. Use tools when appropriate."
 
-# Define a collection of tools used by the model
-tools = []
 
-# Define a simple function tool
-@tool
-def add_numbers(a: int, b: int) -> int:
-    """Return the sum of two numbers"""
-    return a + b
+@lru_cache(maxsize=1)
+def _get_gateway_mcp_client() -> MCPClient:
+    """Create a single MCP client connected to the AgentCore gateway."""
+    endpoint = _get_gateway_endpoint()
+    region = os.getenv("AGENTCORE_GATEWAY_REGION") or os.getenv("AWS_REGION") or "eu-central-1"
 
-tools.append(add_numbers)
+    client = MCPClient(
+        lambda: aws_iam_streamablehttp_client(
+            endpoint=endpoint,
+            aws_service="bedrock-agentcore",
+            aws_region=region,
+        )
+    )
+    client.start()
+    return client
 
 def _make_conversation_manager():
     return NullConversationManager()
+
+
+def _get_gateway_endpoint() -> str:
+    endpoint = os.getenv("AGENTCORE_GATEWAY_ENDPOINT") or os.getenv("BEDROCK_AGENTCORE_GATEWAY_ENDPOINT")
+    if not endpoint:
+        raise RuntimeError(
+            "Missing required AgentCore gateway endpoint. Set AGENTCORE_GATEWAY_ENDPOINT or "
+            "BEDROCK_AGENTCORE_GATEWAY_ENDPOINT."
+        )
+    return endpoint
+
 
 @lru_cache(maxsize=128)
 def _get_agent(session_id: str, actor_id: str) -> Agent:
     """Given a session_id and actor_id, return or construct the corresponding Strands agent.
     Note: caching helps avoid repeated identity fetches on non-bedrock model loads
     and supports in-memory session management for local dev."""
+    gateway_client = _get_gateway_mcp_client()
     return Agent(
         model=load_model(),
         session_manager=get_memory_session_manager(session_id, actor_id),
         conversation_manager=_make_conversation_manager(),
         system_prompt=DEFAULT_SYSTEM_PROMPT,
-        tools=tools,
+        plugins=[AgentCoreToolSearchPlugin(mcp_client=gateway_client)],
     )
 
 def create_app():

@@ -1,3 +1,5 @@
+all: build deploy test
+
 build:
 	agentcore build
 

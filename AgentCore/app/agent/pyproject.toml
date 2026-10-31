@@ -12,6 +12,7 @@ dependencies = [
     "aws-opentelemetry-distro ~= 0.21.0",
     "bedrock-agentcore[strands-agents] >= 1.18.1, < 2.0.0",
     "botocore[crt] ~= 1.43.0",
+    "mcp-proxy-for-aws >= 1.7.0",
     "strands-agents >= 1.62.0, < 2.0.0",
 ]
 

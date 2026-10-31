@@ -38,6 +38,11 @@ Provide either `prompt` or `messages`. The `session_id` is not in the body — i
 | Variable | Required | Description |
 | --- | --- | --- |
 | `LOCAL_DEV` | No | Set to `1` to use `.env.local` instead of AgentCore Identity |
+| `AGENTCORE_GATEWAY_ENDPOINT` | Yes | The Bedrock AgentCore Gateway MCP endpoint, e.g. `https://<gateway-id>.gateway.bedrock-agentcore.<region>.amazonaws.com/mcp` |
+| `AGENTCORE_GATEWAY_REGION` | Yes | AWS region for the gateway; defaults to `AWS_REGION` or `us-east-1` |
+| `BEDROCK_AGENTCORE_GATEWAY_ENDPOINT` | Yes | Alias for `AGENTCORE_GATEWAY_ENDPOINT` |
+
+The AgentCore Gateway is required for this runtime. The service will fail fast at startup if the gateway endpoint is not configured or cannot be reached.
 
 # Developing locally
 
