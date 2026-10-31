@@ -12,3 +12,7 @@ invoke:
 
 test:
 	agentcore dev --mode browser
+
+webgui:
+	source agentcore/.env.local
+	streamlit run streamlit/streamlit.py
