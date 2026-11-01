@@ -41,8 +41,11 @@ Provide either `prompt` or `messages`. The `session_id` is not in the body — i
 | `AGENTCORE_GATEWAY_ENDPOINT` | Yes | The Bedrock AgentCore Gateway MCP endpoint, e.g. `https://<gateway-id>.gateway.bedrock-agentcore.<region>.amazonaws.com/mcp` |
 | `AGENTCORE_GATEWAY_REGION` | Yes | AWS region for the gateway; defaults to `AWS_REGION` or `us-east-1` |
 | `BEDROCK_AGENTCORE_GATEWAY_ENDPOINT` | Yes | Alias for `AGENTCORE_GATEWAY_ENDPOINT` |
+| `BEDROCK_GUARDRAIL_ID` | Yes | ID of the Amazon Bedrock Guardrail to apply to model requests |
+| `BEDROCK_GUARDRAIL_VERSION` | Yes | Guardrail version to apply (use a published version for deployments) |
 
 The AgentCore Gateway is required for this runtime. The service will fail fast at startup if the gateway endpoint is not configured or cannot be reached.
+The Bedrock Guardrail is also required; the runtime fails with an explicit error if either Guardrail setting is missing. For local development, set both variables in the environment. For deployment, add them to the agent runtime's `envVars` in `agentcore/agentcore.json`. The Guardrail must be available in the AWS region used for the Bedrock model.
 
 # Developing locally
 

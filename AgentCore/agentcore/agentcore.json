@@ -17,7 +17,15 @@
         },
         {          
           "name": "AGENTCORE_GATEWAY_REGION", "value": "eu-central-1"
+        },
+        {          
+          "name": "BEDROCK_GUARDRAIL_ID", "value": "hsp1ntvcaf81"
+        },
+        {          
+          "name": "BEDROCK_GUARDRAIL_VERSION", "value": "1"
         }
+
+
       ]
     }
   ],

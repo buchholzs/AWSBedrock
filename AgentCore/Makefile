@@ -8,7 +8,7 @@ deploy:
 
 invoke:
 	agentcore invoke --runtime agent \
-  --payload '{"prompt":"Liste alle meine Aufgaben auf."}' \
+  --payload '{"prompt":"Liste alle meine heutigen Aufgaben auf."}' \
 
 test:
 	agentcore dev --mode browser
