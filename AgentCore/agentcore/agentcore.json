@@ -29,6 +29,13 @@
       ]
     }
   ],
+  "knowledgeBases": [
+    {
+      "type": "AgentCoreKnowledgeBase",
+      "name": "knowledge-base-agentcore",
+      "dataSources": [{ "type": "S3", "uri": "s3://agentcore-knowledgebase-02112026" }]
+    }
+  ],
   "memories": [
     {
       "name": "agentMemory",

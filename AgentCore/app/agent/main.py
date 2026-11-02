@@ -12,6 +12,8 @@ from parse import parse_payload
 from memory.session import get_memory_session_manager
 
 from mcp_proxy_for_aws.client import aws_iam_streamablehttp_client
+from strands.memory import MemoryManager
+from strands.vended_memory_stores import BedrockKnowledgeBaseStore
 
 logger = logging.getLogger(__name__)
 
@@ -82,12 +84,20 @@ def _get_agent(session_id: str, actor_id: str) -> Agent:
     gateway_client = _get_gateway_mcp_client()
     gateway_tools = list(gateway_client.list_tools_sync())
     compatible_tools = _select_compatible_gateway_tools(gateway_tools)
+
+    store = BedrockKnowledgeBaseStore(
+      name="docs",
+      description="Company documentation and policies.",
+      config={"knowledge_base_id": "M42WOV3T2R"},
+    )
+
     return Agent(
         model=load_model(),
         session_manager=get_memory_session_manager(session_id, actor_id),
         conversation_manager=_make_conversation_manager(),
         system_prompt=DEFAULT_SYSTEM_PROMPT,
         tools=compatible_tools,
+        memory_manager=MemoryManager(stores=[store])
     )
 
 def create_app():
