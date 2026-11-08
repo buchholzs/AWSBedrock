@@ -23,6 +23,9 @@
         },
         {          
           "name": "BEDROCK_GUARDRAIL_VERSION", "value": "1"
+        },
+        {          
+          "name": "BEDROCK_AGENTCORE_MEMORY_ID", "value": "AgentCore_default_agentMemory-vV0CKK56JX"
         }
 
 

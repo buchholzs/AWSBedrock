@@ -43,9 +43,12 @@ Provide either `prompt` or `messages`. The `session_id` is not in the body — i
 | `BEDROCK_AGENTCORE_GATEWAY_ENDPOINT` | Yes | Alias for `AGENTCORE_GATEWAY_ENDPOINT` |
 | `BEDROCK_GUARDRAIL_ID` | Yes | ID of the Amazon Bedrock Guardrail to apply to model requests |
 | `BEDROCK_GUARDRAIL_VERSION` | Yes | Guardrail version to apply (use a published version for deployments) |
+| `BEDROCK_AGENTCORE_MEMORY_ID` | Yes | ID of the AgentCore Memory resource named `agentMemory` |
+| `AGENT_ACTOR_ID` | No | Stable end-user ID sent by the Streamlit client; defaults to `"default"` |
 
 The AgentCore Gateway is required for this runtime. The service will fail fast at startup if the gateway endpoint is not configured or cannot be reached.
 The Bedrock Guardrail is also required; the runtime fails with an explicit error if either Guardrail setting is missing. For local development, set both variables in the environment. For deployment, add them to the agent runtime's `envVars` in `agentcore/agentcore.json`. The Guardrail must be available in the AWS region used for the Bedrock model.
+AgentCore Memory must also be configured: without `BEDROCK_AGENTCORE_MEMORY_ID`, the runtime raises an explicit error instead of silently running without persistent memory. The AgentCore toolkit supplies this variable for the deployed memory; for local development, provide it with `agentcore dev --env BEDROCK_AGENTCORE_MEMORY_ID=<memory-id>`. Use the same `actorId` on later requests to retrieve user facts.
 
 # Developing locally
 

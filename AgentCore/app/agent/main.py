@@ -3,7 +3,7 @@ import logging
 import os
 
 from strands import Agent
-from strands.agent.conversation_manager.null_conversation_manager import NullConversationManager
+from strands.agent.conversation_manager.sliding_window_conversation_manager import SlidingWindowConversationManager
 from strands.tools.mcp import MCPClient
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 
@@ -66,7 +66,7 @@ def _get_gateway_mcp_client() -> MCPClient:
     return client
 
 def _make_conversation_manager():
-    return NullConversationManager()
+    return SlidingWindowConversationManager()
 
 
 def _get_gateway_endpoint() -> str:
