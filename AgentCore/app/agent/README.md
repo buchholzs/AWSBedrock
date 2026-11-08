@@ -48,7 +48,7 @@ Provide either `prompt` or `messages`. The `session_id` is not in the body — i
 
 The AgentCore Gateway is required for this runtime. The service will fail fast at startup if the gateway endpoint is not configured or cannot be reached.
 The Bedrock Guardrail is also required; the runtime fails with an explicit error if either Guardrail setting is missing. For local development, set both variables in the environment. For deployment, add them to the agent runtime's `envVars` in `agentcore/agentcore.json`. The Guardrail must be available in the AWS region used for the Bedrock model.
-AgentCore Memory must also be configured: without `BEDROCK_AGENTCORE_MEMORY_ID`, the runtime raises an explicit error instead of silently running without persistent memory. The AgentCore toolkit supplies this variable for the deployed memory; for local development, provide it with `agentcore dev --env BEDROCK_AGENTCORE_MEMORY_ID=<memory-id>`. Use the same `actorId` on later requests to retrieve user facts.
+AgentCore Memory must also be configured: without `BEDROCK_AGENTCORE_MEMORY_ID`, the runtime raises an explicit error instead of silently running without persistent memory. The AgentCore toolkit supplies this variable for the deployed memory; for local development, provide it with `agentcore dev --env BEDROCK_AGENTCORE_MEMORY_ID=<memory-id>`. Use the same `actorId` on later requests to retrieve user facts and preferences. Long-term memory extraction is managed by the configured Memory strategies, so explicitly state lasting preferences (for example, “Please remember that I prefer concise answers”) and allow processing time before testing them in a new conversation.
 
 # Developing locally
 
